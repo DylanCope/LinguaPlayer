@@ -143,15 +143,19 @@ namespace VideoPlayer
             // Add context menu
             var contextMenu = new ContextMenu();
             var mergeMenuItem = new MenuItem { Header = "Merge Subtitles" };
+            var exportAudioMenuItem = new MenuItem { Header = "Export Audio" };
             mergeMenuItem.Click += MergeSubtitles_Click;
+            exportAudioMenuItem.Click += ExportAudio_Click;
             contextMenu.Items.Add(mergeMenuItem);
+            contextMenu.Items.Add(exportAudioMenuItem);
             SubtitleListView.ContextMenu = contextMenu;
             
-            // Handle context menu opening to enable/disable merge option
+            // Handle context menu opening to enable/disable options
             contextMenu.Opened += (s, e) =>
             {
                 var selectedItems = SubtitleListView.SelectedItems.Cast<SubtitleItem>().ToList();
                 mergeMenuItem.IsEnabled = CanMergeSubtitles(selectedItems);
+                exportAudioMenuItem.IsEnabled = selectedItems.Count > 0 && !string.IsNullOrEmpty(_currentVideoPath);
             };
             
             // Clear subtitle overlay
@@ -957,6 +961,44 @@ namespace VideoPlayer
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private async void ExportAudio_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var selectedSubtitles = SubtitleListView.SelectedItems.Cast<SubtitleItem>().ToList();
+                if (selectedSubtitles.Count == 0 || string.IsNullOrEmpty(_currentVideoPath))
+                {
+                    CustomMessageBox.Show("Please select subtitles and ensure a video is loaded.", "Warning");
+                    return;
+                }
+
+                var exportWindow = new ExportOptionsWindow(selectedSubtitles, _currentVideoPath)
+                {
+                    Owner = this
+                };
+
+                if (exportWindow.ShowDialog() == true)
+                {
+                    var audioExportService = new AudioExportService();
+                    try
+                    {
+                        Mouse.OverrideCursor = Cursors.Wait;
+                        await audioExportService.ExportAudioAsync(_currentVideoPath, exportWindow.OutputPath, selectedSubtitles);
+                        ShowSuccessMessage("Audio exported successfully!");
+                    }
+                    finally
+                    {
+                        Mouse.OverrideCursor = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error exporting audio: {ex}");
+                CustomMessageBox.Show($"Error exporting audio: {ex.Message}", "Error");
+            }
         }
     }
 }

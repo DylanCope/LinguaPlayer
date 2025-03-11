@@ -9,10 +9,17 @@
 
   <ItemGroup>
     <None Remove="Fonts\FiraCode-Retina.ttf" />
+    <None Remove="FFmpeg\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Fonts\FiraCode-Retina.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="FFmpeg\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
