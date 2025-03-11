@@ -318,7 +318,7 @@
                 </Menu>
 
                 <!-- Window Title -->
-                <TextBlock Grid.Column="1" Text="LingualPlayer" 
+                <TextBlock Grid.Column="1" Text="LinguaPlayer" 
                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
                 <!-- Window Controls -->

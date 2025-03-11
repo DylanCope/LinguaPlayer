@@ -608,9 +608,17 @@ namespace VideoPlayer
 
         private void TimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (_isDraggingSlider && sender is Slider)
+            if (sender is Slider && VideoPlayer?.Source != null)
             {
+                // Update time display
                 UpdateTimeDisplay(TimeSpan.FromSeconds(e.NewValue), VideoPlayer.NaturalDuration.TimeSpan);
+
+                // Update video position if not currently dragging
+                if (!_isDraggingSlider)
+                {
+                    VideoPlayer.Position = TimeSpan.FromSeconds(e.NewValue);
+                    UpdateCurrentSubtitle();
+                }
             }
         }
 
