@@ -6,7 +6,7 @@ namespace VideoPlayer
     public partial class PreferencesWindow : Window
     {
         public bool ShowSuccessPopups { get; private set; }
-        public double FontSize { get; private set; }
+        public new double FontSize { get; private set; }  // Add 'new' keyword to explicitly hide base member
 
         public PreferencesWindow(bool currentShowSuccessPopups, double currentFontSize)
         {
@@ -19,7 +19,7 @@ namespace VideoPlayer
             // Set the initial font size selection
             foreach (ComboBoxItem item in FontSizeComboBox.Items)
             {
-                if (double.Parse(item.Tag.ToString()) == currentFontSize)
+                if (item.Tag != null && double.TryParse(item.Tag.ToString(), out double itemFontSize) && itemFontSize == currentFontSize)
                 {
                     FontSizeComboBox.SelectedItem = item;
                     break;
@@ -36,7 +36,13 @@ namespace VideoPlayer
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             ShowSuccessPopups = ShowSuccessPopupsCheckBox.IsChecked ?? true;
-            FontSize = double.Parse(((ComboBoxItem)FontSizeComboBox.SelectedItem).Tag.ToString());
+            
+            var selectedItem = FontSizeComboBox.SelectedItem as ComboBoxItem;
+            if (selectedItem?.Tag != null && double.TryParse(selectedItem.Tag.ToString(), out double newFontSize))
+            {
+                FontSize = newFontSize;
+            }
+            
             DialogResult = true;
             Close();
         }

@@ -26,10 +26,10 @@ namespace VideoPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly SubtitleService _subtitleService;
-        private readonly DispatcherTimer _timer;
+        private readonly SubtitleService _subtitleService = new();
+        private readonly DispatcherTimer _timer = new();
         private bool _isPlaying;
-        private List<SubtitleItem>? _subtitles;
+        private List<SubtitleItem> _subtitles = new();
         private SubtitleItem? _currentSubtitle;
         private bool _isDraggingSlider;
         private string? _currentVideoPath;
@@ -67,8 +67,6 @@ namespace VideoPlayer
                 InitializeComponent();
                 
                 // Initialize fields that were causing nullable warnings
-                _subtitleService = new SubtitleService();
-                _timer = new DispatcherTimer();
                 _timer.Interval = TimeSpan.FromMilliseconds(50);
                 _timer.Tick += Timer_Tick;
 
@@ -452,8 +450,11 @@ namespace VideoPlayer
         {
             try
             {
-                await _subtitleService.SaveSubtitlesAsync(filePath, _subtitles);
-                ShowSuccessMessage("Subtitles saved successfully!");
+                if (_subtitles != null)
+                {
+                    await _subtitleService.SaveSubtitlesAsync(filePath, _subtitles);
+                    ShowSuccessMessage("Subtitles saved successfully!");
+                }
             }
             catch (Exception ex)
             {
