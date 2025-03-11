@@ -779,6 +779,12 @@ namespace VideoPlayer
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
+            // Ignore keyboard shortcuts if any TextBox has focus
+            if (e.OriginalSource is TextBox)
+            {
+                return;
+            }
+
             if (VideoPlayer?.Source == null || _subtitles == null || _subtitles.Count == 0) return;
 
             try
