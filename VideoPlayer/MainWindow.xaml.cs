@@ -27,12 +27,14 @@ namespace VideoPlayer
     public partial class MainWindow : Window
     {
         private readonly SubtitleService _subtitleService;
-        private DispatcherTimer _timer;
+        private readonly DispatcherTimer _timer;
         private bool _isPlaying;
-        private List<SubtitleItem> _subtitles = new List<SubtitleItem>();
+        private List<SubtitleItem>? _subtitles;
         private SubtitleItem? _currentSubtitle;
         private bool _isDraggingSlider;
         private string? _currentVideoPath;
+        private bool _showSuccessPopups = true; // Default value
+        private double _currentFontSize = 14; // Default font size
 
         // Add logging
         private void Log(string message)
@@ -52,7 +54,7 @@ namespace VideoPlayer
                 Application.Current.DispatcherUnhandledException += (s, e) =>
                 {
                     Log($"Unhandled exception in dispatcher: {e.Exception}");
-                    MessageBox.Show($"An error occurred: {e.Exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CustomMessageBox.Show($"An error occurred: {e.Exception.Message}", "Error");
                     e.Handled = true;
                 };
 
@@ -63,11 +65,19 @@ namespace VideoPlayer
 
                 Log("Initializing MainWindow");
                 InitializeComponent();
-                _subtitleService = new SubtitleService();
                 
+                // Initialize fields that were causing nullable warnings
+                _subtitleService = new SubtitleService();
                 _timer = new DispatcherTimer();
-                _timer.Interval = TimeSpan.FromMilliseconds(100);
+                _timer.Interval = TimeSpan.FromMilliseconds(50);
                 _timer.Tick += Timer_Tick;
+
+                // Enable window dragging
+                this.MouseLeftButtonDown += (s, e) =>
+                {
+                    if (e.ChangedButton == MouseButton.Left)
+                        this.DragMove();
+                };
 
                 InitializeVideoPlayer();
                 InitializeSubtitleControls();
@@ -80,8 +90,8 @@ namespace VideoPlayer
             catch (Exception ex)
             {
                 Log($"Fatal error during initialization: {ex}");
-                MessageBox.Show("Fatal error during application initialization. The application will now close.", 
-                    "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show("Fatal error during application initialization. The application will now close.", 
+                    "Fatal Error");
                 Application.Current.Shutdown();
             }
         }
@@ -122,7 +132,7 @@ namespace VideoPlayer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error initializing video player: {ex.Message}", "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error initializing video player: {ex.Message}", "Initialization Error");
             }
         }
 
@@ -156,7 +166,7 @@ namespace VideoPlayer
             ApplyChangesButton.IsEnabled = false;
             SyncStartButton.IsEnabled = false;
             SyncEndButton.IsEnabled = false;
-            SaveSubtitlesButton.IsEnabled = false;
+            SaveSubtitlesMenuItem.IsEnabled = false;
         }
 
         private bool CanMergeSubtitles(List<SubtitleItem> selectedSubtitles)
@@ -188,7 +198,7 @@ namespace VideoPlayer
                 var selectedSubtitles = SubtitleListView.SelectedItems.Cast<SubtitleItem>().ToList();
                 if (!CanMergeSubtitles(selectedSubtitles))
                 {
-                    MessageBox.Show("Cannot merge non-consecutive subtitles.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    CustomMessageBox.Show("Cannot merge non-consecutive subtitles.", "Warning");
                     return;
                 }
 
@@ -198,7 +208,7 @@ namespace VideoPlayer
                 // Create merged subtitle
                 var mergedSubtitle = new SubtitleItem
                 {
-                    StartTime = selectedSubtitles.First().StartTime, // Use First() since we sorted by start time
+                    StartTime = selectedSubtitles.First().StartTime,
                     EndTime = selectedSubtitles.Max(s => s.EndTime),
                     Text = string.Join("\n", selectedSubtitles.Select(s => s.Text))
                 };
@@ -223,12 +233,12 @@ namespace VideoPlayer
                 SubtitleListView.SelectedItem = mergedSubtitle;
                 SubtitleListView.ScrollIntoView(mergedSubtitle);
 
-                MessageBox.Show("Subtitles merged successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowSuccessMessage("Subtitles merged successfully!");
             }
             catch (Exception ex)
             {
                 Log($"Error merging subtitles: {ex}");
-                MessageBox.Show($"Error merging subtitles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error merging subtitles: {ex.Message}", "Error");
             }
         }
 
@@ -368,7 +378,7 @@ namespace VideoPlayer
                 catch (Exception ex)
                 {
                     Log($"Error loading video: {ex}");
-                    MessageBox.Show($"Error loading video: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CustomMessageBox.Show($"Error loading video: {ex.Message}", "Error");
                     
                     // Reset state on error
                     Log("Resetting player state after error");
@@ -414,13 +424,13 @@ namespace VideoPlayer
                 ApplyChangesButton.IsEnabled = true;
                 SyncStartButton.IsEnabled = true;
                 SyncEndButton.IsEnabled = true;
-                SaveSubtitlesButton.IsEnabled = true;
+                SaveSubtitlesMenuItem.IsEnabled = true;
 
-                MessageBox.Show("Subtitles loaded successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowSuccessMessage("Subtitles loaded successfully!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading subtitles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error loading subtitles: {ex.Message}", "Error");
             }
         }
 
@@ -443,11 +453,11 @@ namespace VideoPlayer
             try
             {
                 await _subtitleService.SaveSubtitlesAsync(filePath, _subtitles);
-                MessageBox.Show("Subtitles saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowSuccessMessage("Subtitles saved successfully!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving subtitles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error saving subtitles: {ex.Message}", "Error");
             }
         }
 
@@ -471,7 +481,7 @@ namespace VideoPlayer
         private void VideoPlayer_MediaFailed(object? sender, ExceptionRoutedEventArgs e)
         {
             Log($"MediaFailed event: {e.ErrorException}");
-            MessageBox.Show($"Error loading video: {e.ErrorException.Message}", "Media Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            CustomMessageBox.Show($"Error loading video: {e.ErrorException.Message}", "Media Error");
         }
 
         private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
@@ -516,7 +526,7 @@ namespace VideoPlayer
             catch (Exception ex)
             {
                 Log($"Error in MediaOpened: {ex}");
-                MessageBox.Show($"Error initializing video: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error initializing video: {ex.Message}", "Error");
                 
                 // Reset state on error
                 VideoPlayer.Source = null;
@@ -710,7 +720,7 @@ namespace VideoPlayer
             var selectedSubtitle = SubtitleListView.SelectedItem as SubtitleItem;
             if (selectedSubtitle == null)
             {
-                MessageBox.Show("Please select a subtitle to edit.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CustomMessageBox.Show("Please select a subtitle to edit.", "Warning");
                 return;
             }
 
@@ -751,11 +761,11 @@ namespace VideoPlayer
                     LockEditorCheckBox.IsChecked = false;
                 }
 
-                MessageBox.Show("Changes applied successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowSuccessMessage("Changes applied successfully!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error applying changes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Error applying changes: {ex.Message}", "Error");
             }
         }
 
@@ -844,10 +854,94 @@ namespace VideoPlayer
             }
         }
 
+        private void FileExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             _timer.Stop();
             base.OnClosing(e);
+        }
+
+        private void ShowPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            var preferencesWindow = new PreferencesWindow(_showSuccessPopups, _currentFontSize)
+            {
+                Owner = this
+            };
+
+            if (preferencesWindow.ShowDialog() == true)
+            {
+                _showSuccessPopups = preferencesWindow.ShowSuccessPopups;
+                if (_currentFontSize != preferencesWindow.FontSize)
+                {
+                    _currentFontSize = preferencesWindow.FontSize;
+                    UpdateFontSize(_currentFontSize);
+                }
+            }
+        }
+
+        private void UpdateFontSize(double fontSize)
+        {
+            // Create and apply new styles with updated font sizes
+            var baseTextStyle = (Style)FindResource(typeof(TextBlock));
+            var newTextStyle = new Style(typeof(TextBlock), baseTextStyle);
+            newTextStyle.Setters.Add(new Setter(TextBlock.FontSizeProperty, fontSize));
+            Resources[typeof(TextBlock)] = newTextStyle;
+
+            var baseButtonStyle = (Style)FindResource(typeof(Button));
+            var newButtonStyle = new Style(typeof(Button), baseButtonStyle);
+            newButtonStyle.Setters.Add(new Setter(Button.FontSizeProperty, fontSize));
+            Resources[typeof(Button)] = newButtonStyle;
+
+            var baseTextBoxStyle = (Style)FindResource(typeof(TextBox));
+            var newTextBoxStyle = new Style(typeof(TextBox), baseTextBoxStyle);
+            newTextBoxStyle.Setters.Add(new Setter(TextBox.FontSizeProperty, fontSize));
+            Resources[typeof(TextBox)] = newTextBoxStyle;
+
+            var baseMenuStyle = (Style)FindResource(typeof(Menu));
+            var newMenuStyle = new Style(typeof(Menu), baseMenuStyle);
+            newMenuStyle.Setters.Add(new Setter(Menu.FontSizeProperty, fontSize));
+            Resources[typeof(Menu)] = newMenuStyle;
+
+            var baseMenuItemStyle = (Style)FindResource(typeof(MenuItem));
+            var newMenuItemStyle = new Style(typeof(MenuItem), baseMenuItemStyle);
+            newMenuItemStyle.Setters.Add(new Setter(MenuItem.FontSizeProperty, fontSize));
+            Resources[typeof(MenuItem)] = newMenuItemStyle;
+
+            var baseCheckBoxStyle = (Style)FindResource(typeof(CheckBox));
+            var newCheckBoxStyle = new Style(typeof(CheckBox), baseCheckBoxStyle);
+            newCheckBoxStyle.Setters.Add(new Setter(CheckBox.FontSizeProperty, fontSize));
+            Resources[typeof(CheckBox)] = newCheckBoxStyle;
+
+            // Update subtitle overlay font size (slightly larger than UI font)
+            SubtitleOverlay.FontSize = fontSize * 1.5;
+        }
+
+        private void ShowSuccessMessage(string message)
+        {
+            if (_showSuccessPopups)
+            {
+                CustomMessageBox.Show(message, "Success");
+            }
+        }
+
+        // Window control event handlers
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

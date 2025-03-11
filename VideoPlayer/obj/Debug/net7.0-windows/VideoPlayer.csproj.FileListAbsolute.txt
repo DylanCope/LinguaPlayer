@@ -19,3 +19,7 @@ C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\VideoPlayer.pdb
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\VideoPlayer.genruntimeconfig.cache
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\ref\VideoPlayer.dll
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\PreferencesWindow.baml
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\PreferencesWindow.g.cs
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\CustomMessageBox.baml
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\CustomMessageBox.g.cs

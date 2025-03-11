@@ -5,165 +5,494 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VideoPlayer"
         mc:Ignorable="d"
-        Title="Video Player with Subtitle Editor" Height="720" Width="1280">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="100" />
-        </Grid.RowDefinitions>
+        Title="Video Player with Subtitle Editor" 
+        Height="720" 
+        Width="1280"
+        Background="#282c34"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <FontFamily x:Key="UIFont">pack://application:,,,/Fonts/#Fira Code Retina</FontFamily>
+        <FontFamily x:Key="SubtitleFont">Segoe UI</FontFamily>
+        
+        <!-- Modern Video Slider Style -->
+        <Style x:Key="VideoSliderStyle" TargetType="Slider">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="TrackBackground" Grid.Row="1" 
+                                    Height="4" 
+                                    Background="#21252b" 
+                                    CornerRadius="2"/>
+                            <Track x:Name="PART_Track" Grid.Row="1">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="4" Background="#80FFFFFF" CornerRadius="2"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="4" Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Width="12" Height="12" Fill="#DCDCDC"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <!-- Subtitle Browser/Editor Panel -->
-        <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <!-- Modern ScrollBar Style -->
+        <Style x:Key="ModernScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Rectangle Fill="#50FFFFFF" 
+                                 RadiusX="2" 
+                                 RadiusY="2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <!-- Subtitle File Controls -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                <TextBlock Text="Subtitle Controls" FontWeight="Bold" Margin="0,0,0,5"/>
-                <UniformGrid Columns="2" Margin="0,0,0,5">
-                    <Button x:Name="LoadSubtitlesButton" Content="Load Subtitles" 
-                            Margin="0,0,5,0" Padding="5,3" Click="LoadSubtitlesButton_Click"/>
-                    <Button x:Name="SaveSubtitlesButton" Content="Save Subtitles" 
-                            Padding="5,3" Click="SaveSubtitlesButton_Click"/>
-                </UniformGrid>
-            </StackPanel>
+        <Style x:Key="ModernScrollBar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid>
+                            <Rectangle Width="8" 
+                                     Fill="Transparent"/>
+                            <Track x:Name="PART_Track" 
+                                  IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ModernScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PART_Track" 
+                                        Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter TargetName="PART_Track" 
+                                        Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <!-- Subtitle List -->
-            <ListView x:Name="SubtitleListView" Grid.Row="1" 
-                      Margin="0,0,0,10"
-                      SelectionMode="Single"
-                      SelectionChanged="SubtitleListView_SelectionChanged"
-                      BorderThickness="1"
-                      BorderBrush="#FFABADB3">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="{Binding FormattedTime}" FontWeight="Bold" 
-                                     Foreground="#FF444444"/>
-                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" 
-                                     Margin="0,3,0,0"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+        <Style TargetType="{x:Type ScrollViewer}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ScrollContentPresenter Grid.Column="0"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar"
+                                     Grid.Column="1"
+                                     Value="{TemplateBinding VerticalOffset}"
+                                     Maximum="{TemplateBinding ScrollableHeight}"
+                                     ViewportSize="{TemplateBinding ViewportHeight}"
+                                     Style="{StaticResource ModernScrollBar}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Default style for all TextBlocks -->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+        </Style>
+        
+        <!-- Default style for all Buttons -->
+        <Style TargetType="Button">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Background" Value="#21252b"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2c313a"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#1d1f23"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#1d1f23"/>
+                    <Setter Property="Foreground" Value="#707070"/>
+                    <Setter Property="Opacity" Value="0.7"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <!-- Subtitle Editor -->
-            <Grid Grid.Row="2">
+        <!-- Default style for all TextBoxes -->
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#21252b"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+            <Setter Property="CaretBrush" Value="#DCDCDC"/>
+            <Setter Property="BorderBrush" Value="#1d1f23"/>
+        </Style>
+
+        <!-- Default style for Menu and MenuItems -->
+        <Style TargetType="Menu">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+        </Style>
+        
+        <Style TargetType="MenuItem">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+            <Setter Property="Background" Value="#21252b"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Border" 
+                               Background="{TemplateBinding Background}"
+                               BorderThickness="0"
+                               SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Icon"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut"/>
+                                    <ColumnDefinition Width="13"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter x:Name="Icon" Margin="6,0,6,0" VerticalAlignment="Center" ContentSource="Icon"/>
+                                <ContentPresenter x:Name="HeaderHost" Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" Margin="2,4"/>
+                                <ContentPresenter x:Name="SubmenuPresenter" Grid.Column="3" Margin="10,3,0,3" ContentSource="InputGestureText"/>
+                                <Path x:Name="ArrowPath" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                      Data="M 0,0 L 4,3.5 L 0,7 Z" Fill="#DCDCDC" Margin="4,0,6,0"
+                                      Visibility="{Binding HasItems, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                <Popup x:Name="Popup" Placement="Right" 
+                                       HorizontalOffset="-1" VerticalOffset="-3" 
+                                       IsOpen="{TemplateBinding IsSubmenuOpen}" 
+                                       AllowsTransparency="True" 
+                                       Focusable="False" 
+                                       PopupAnimation="Fade">
+                                    <Border x:Name="SubmenuBorder" 
+                                           Background="#21252b" 
+                                           BorderBrush="#1d1f23" 
+                                           BorderThickness="1"
+                                           SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" 
+                                                  KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter Property="Background" Value="#2c313a"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#707070"/>
+                            </Trigger>
+                            <Trigger Property="Role" Value="TopLevelHeader">
+                                <Setter TargetName="Popup" Property="Placement" Value="Bottom"/>
+                                <Setter TargetName="ArrowPath" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="Role" Value="TopLevelItem">
+                                <Setter TargetName="ArrowPath" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="Role" Value="SubmenuHeader">
+                                <Setter TargetName="Popup" Property="Placement" Value="Right"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style for Separator in Menu -->
+        <Style TargetType="Separator">
+            <Setter Property="Background" Value="#1d1f23"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+
+        <!-- Style for CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+        </Style>
+
+        <!-- Style for ListView -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="#21252b"/>
+            <Setter Property="BorderBrush" Value="#1d1f23"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+        </Style>
+
+        <!-- Style for ListViewItem -->
+        <Style TargetType="ListViewItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#DCDCDC"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#2c313a"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2c313a"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style for ContextMenu -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="#21252b"/>
+            <Setter Property="BorderBrush" Value="#1d1f23"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="2"/>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderThickness="1" BorderBrush="#1d1f23">
+        <DockPanel>
+            <!-- Custom Title Bar -->
+            <Grid DockPanel.Dock="Top" Height="32" Background="#21252b">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Menu in Title Bar -->
+                <Menu Grid.Column="0" VerticalAlignment="Center" Margin="5,0,0,0">
+                    <MenuItem Header="_File">
+                        <MenuItem x:Name="LoadVideoMenuItem" Header="_Load Video" Click="LoadVideoButton_Click"/>
+                        <MenuItem x:Name="LoadSubtitlesMenuItem" Header="Load _Subtitles" Click="LoadSubtitlesButton_Click"/>
+                        <MenuItem x:Name="SaveSubtitlesMenuItem" Header="_Save Subtitles" Click="SaveSubtitlesButton_Click"/>
+                        <Separator/>
+                        <MenuItem Header="E_xit" Click="FileExit_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="_Options">
+                        <MenuItem Header="_Preferences" Click="ShowPreferences_Click"/>
+                    </MenuItem>
+                </Menu>
+
+                <!-- Window Title -->
+                <TextBlock Grid.Column="1" Text="LingualPlayer" 
+                          VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+                <!-- Window Controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="−" Width="45" Height="32" Click="MinimizeButton_Click"/>
+                    <Button Content="□" Width="45" Height="32" Click="MaximizeButton_Click"/>
+                    <Button Content="×" Width="45" Height="32" Click="CloseButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Main Content -->
+            <Grid Background="#282c34">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>  <!-- Header -->
-                    <RowDefinition Height="Auto"/>  <!-- Time Controls -->
-                    <RowDefinition Height="Auto"/>  <!-- Text Label -->
-                    <RowDefinition Height="Auto"/>  <!-- Text Box -->
-                    <RowDefinition Height="Auto"/>  <!-- Apply Button -->
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="100" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Subtitle Editor" FontWeight="Bold" 
-                         Grid.Row="0" Margin="0,0,0,10"/>
-
-                <!-- Time Controls -->
-                <Grid Grid.Row="1" Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <!-- Subtitle Browser/Editor Panel -->
+                <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="10">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Remove the old buttons panel -->
+                    <TextBlock Text="Subtitle Browser" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                    <!-- Subtitle List -->
+                    <ListView x:Name="SubtitleListView" Grid.Row="1" 
+                              Margin="0,0,0,10"
+                              SelectionMode="Extended"
+                              SelectionChanged="SubtitleListView_SelectionChanged"
+                              BorderThickness="1"
+                              Background="#21252b"
+                              BorderBrush="#1d1f23">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,5">
+                                    <TextBlock Text="{Binding FormattedTime}" FontWeight="Bold" 
+                                             Foreground="#FFDCDCDC"/>
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" 
+                                             Margin="0,3,0,0"
+                                             FontFamily="{StaticResource SubtitleFont}"
+                                             Foreground="#FFDCDCDC"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!-- Subtitle Editor -->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>  <!-- Header -->
+                            <RowDefinition Height="Auto"/>  <!-- Time Controls -->
+                            <RowDefinition Height="Auto"/>  <!-- Text Label -->
+                            <RowDefinition Height="Auto"/>  <!-- Text Box -->
+                            <RowDefinition Height="Auto"/>  <!-- Apply Button -->
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Subtitle Editor" FontWeight="Bold" 
+                                 Grid.Row="0" Margin="0,0,0,10"/>
+
+                        <!-- Time Controls -->
+                        <Grid Grid.Row="1" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Start:" Grid.Row="0" Grid.Column="0" 
+                                     VerticalAlignment="Center" Margin="0,0,10,5"/>
+                            <TextBox x:Name="StartTimeTextBox" Grid.Row="0" Grid.Column="1" 
+                                    Padding="5,3" Margin="0,0,10,5"/>
+                            <Button x:Name="SyncStartButton" Content="Sync" Grid.Row="0" 
+                                    Grid.Column="2" Padding="10,3" Click="SyncStartButton_Click"
+                                    Background="#21252b"/>
+
+                            <TextBlock Text="End:" Grid.Row="1" Grid.Column="0" 
+                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox x:Name="EndTimeTextBox" Grid.Row="1" Grid.Column="1" 
+                                    Padding="5,3" Margin="0,0,10,0"/>
+                            <Button x:Name="SyncEndButton" Content="Sync" Grid.Row="1" 
+                                    Grid.Column="2" Padding="10,3" Click="SyncEndButton_Click"
+                                    Background="#21252b"/>
+
+                            <CheckBox x:Name="LockEditorCheckBox" Content="Lock Editor" 
+                                     Grid.Row="2" Grid.Column="1" Margin="0,5,0,0"/>
+                        </Grid>
+
+                        <!-- Text Editor -->
+                        <TextBlock Text="Subtitle Text:" Grid.Row="2" Margin="0,0,0,5"/>
+                        <TextBox x:Name="SubtitleTextBox" Grid.Row="3"
+                                 AcceptsReturn="True" TextWrapping="Wrap" 
+                                 Height="80"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Padding="5"
+                                 Margin="0,0,0,10"/>
+
+                        <!-- Apply Changes Button -->
+                        <Button x:Name="ApplyChangesButton" Content="Apply Changes" 
+                                Grid.Row="4"
+                                HorizontalAlignment="Right"
+                                Padding="15,5" 
+                                Click="ApplyChangesButton_Click"
+                                Background="#21252b"
+                                Margin="0,0,0,5"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Video Player -->
+                <Grid Grid.Column="1" Grid.Row="0" Margin="5">
+                    <MediaElement x:Name="VideoPlayer" 
+                                 LoadedBehavior="Manual"
+                                 UnloadedBehavior="Stop"
+                                 MediaOpened="VideoPlayer_MediaOpened"
+                                 MediaEnded="VideoPlayer_MediaEnded"
+                                 Stretch="Uniform"
+                                 IsMuted="False"
+                                 Volume="1"/>
+                    
+                    <!-- Subtitle Overlay -->
+                    <Border VerticalAlignment="Bottom" 
+                            Margin="0,0,0,20" 
+                            Background="#80000000" 
+                            Padding="10,5">
+                        <TextBlock x:Name="SubtitleOverlay"
+                                 Text=""
+                                 TextWrapping="Wrap"
+                                 TextAlignment="Center"
+                                 Foreground="White"
+                                 FontSize="24"
+                                 FontFamily="{StaticResource SubtitleFont}"
+                                 FontWeight="SemiBold"/>
+                    </Border>
+                </Grid>
+
+                <!-- Video Controls -->
+                <Grid Grid.Column="1" Grid.Row="1" Margin="5">
+                    <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Start:" Grid.Row="0" Grid.Column="0" 
-                             VerticalAlignment="Center" Margin="0,0,10,5"/>
-                    <TextBox x:Name="StartTimeTextBox" Grid.Row="0" Grid.Column="1" 
-                            Padding="5,3" Margin="0,0,10,5"/>
-                    <Button x:Name="SyncStartButton" Content="Sync" Grid.Row="0" 
-                            Grid.Column="2" Padding="10,3" Click="SyncStartButton_Click"/>
+                    <Slider x:Name="TimelineSlider" 
+                            Grid.Row="0" 
+                            Margin="0,0,0,5"
+                            Style="{StaticResource VideoSliderStyle}"
+                            IsMoveToPointEnabled="True"
+                            IsSelectionRangeEnabled="True"
+                            Cursor="Hand"
+                            Focusable="False"
+                            ValueChanged="TimelineSlider_ValueChanged"
+                            PreviewMouseLeftButtonDown="TimelineSlider_MouseLeftButtonDown"
+                            PreviewMouseLeftButtonUp="TimelineSlider_MouseLeftButtonUp"
+                            PreviewMouseMove="TimelineSlider_MouseMove"/>
 
-                    <TextBlock Text="End:" Grid.Row="1" Grid.Column="0" 
-                             VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBox x:Name="EndTimeTextBox" Grid.Row="1" Grid.Column="1" 
-                            Padding="5,3" Margin="0,0,10,0"/>
-                    <Button x:Name="SyncEndButton" Content="Sync" Grid.Row="1" 
-                            Grid.Column="2" Padding="10,3" Click="SyncEndButton_Click"/>
-
-                    <CheckBox x:Name="LockEditorCheckBox" Content="Lock Editor" 
-                             Grid.Row="2" Grid.Column="1" Margin="0,5,0,0"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="PlayPauseButton" Content="Play" Margin="0,0,5,0" Click="PlayPauseButton_Click"/>
+                        <TextBlock x:Name="TimeDisplay" VerticalAlignment="Center" 
+                                   Text="00:00:00 / 00:00:00" Margin="5,0"/>
+                    </StackPanel>
                 </Grid>
-
-                <!-- Text Editor -->
-                <TextBlock Text="Subtitle Text:" Grid.Row="2" Margin="0,0,0,5"/>
-                <TextBox x:Name="SubtitleTextBox" Grid.Row="3"
-                         AcceptsReturn="True" TextWrapping="Wrap" 
-                         Height="80"
-                         VerticalScrollBarVisibility="Auto"
-                         Padding="5"
-                         Margin="0,0,0,10"/>
-
-                <!-- Apply Changes Button -->
-                <Button x:Name="ApplyChangesButton" Content="Apply Changes" 
-                        Grid.Row="4"
-                        HorizontalAlignment="Right"
-                        Padding="15,5" 
-                        Click="ApplyChangesButton_Click"
-                        Margin="0,0,0,5"/>
             </Grid>
-        </Grid>
-
-        <!-- Video Player -->
-        <Grid Grid.Column="1" Grid.Row="0" Margin="5">
-            <MediaElement x:Name="VideoPlayer" 
-                         LoadedBehavior="Manual"
-                         UnloadedBehavior="Stop"
-                         MediaOpened="VideoPlayer_MediaOpened"
-                         MediaEnded="VideoPlayer_MediaEnded"
-                         Stretch="Uniform"
-                         IsMuted="False"
-                         Volume="1"/>
-            
-            <!-- Subtitle Overlay -->
-            <Border VerticalAlignment="Bottom" 
-                    Margin="0,0,0,20" 
-                    Background="#80000000" 
-                    Padding="10,5">
-                <TextBlock x:Name="SubtitleOverlay"
-                         Text=""
-                         TextWrapping="Wrap"
-                         TextAlignment="Center"
-                         Foreground="White"
-                         FontSize="24"
-                         FontWeight="SemiBold"/>
-            </Border>
-        </Grid>
-
-        <!-- Video Controls -->
-        <Grid Grid.Column="1" Grid.Row="1" Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <Slider x:Name="TimelineSlider" 
-                    Grid.Row="0" 
-                    Margin="0,0,0,5"
-                    IsMoveToPointEnabled="False"
-                    IsSelectionRangeEnabled="False"
-                    Cursor="Hand"
-                    Focusable="False"/>
-
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="LoadVideoButton" Content="Load Video" Margin="0,0,5,0" Click="LoadVideoButton_Click"/>
-                <Button x:Name="PlayPauseButton" Content="Play" Margin="0,0,5,0" Click="PlayPauseButton_Click"/>
-                <TextBlock x:Name="TimeDisplay" VerticalAlignment="Center" 
-                           Text="00:00:00 / 00:00:00" Margin="5,0"/>
-            </StackPanel>
-        </Grid>
-    </Grid>
+        </DockPanel>
+    </Border>
 </Window>
