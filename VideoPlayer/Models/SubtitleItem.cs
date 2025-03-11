@@ -14,7 +14,7 @@ namespace VideoPlayer.Models
         
         private string FormatTimeSpan(TimeSpan time)
         {
-            return $"{time.Hours:D2}:{time.Minutes:D2}:{time.Minutes:D2},{time.Milliseconds:D3}";
+            return $"{time.Hours:D2}:{time.Minutes:D2}:{time.Seconds:D2},{time.Milliseconds:D3}";
         }
     }
 } 

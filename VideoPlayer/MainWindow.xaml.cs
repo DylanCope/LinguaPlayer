@@ -192,16 +192,16 @@ namespace VideoPlayer
                     return;
                 }
 
+                // Sort selected subtitles by start time to ensure correct order
+                selectedSubtitles = selectedSubtitles.OrderBy(s => s.StartTime).ToList();
+
                 // Create merged subtitle
                 var mergedSubtitle = new SubtitleItem
                 {
-                    StartTime = selectedSubtitles.Min(s => s.StartTime),
+                    StartTime = selectedSubtitles.First().StartTime, // Use First() since we sorted by start time
                     EndTime = selectedSubtitles.Max(s => s.EndTime),
                     Text = string.Join("\n", selectedSubtitles.Select(s => s.Text))
                 };
-
-                // Get index where to insert merged subtitle
-                int firstIndex = _subtitles.IndexOf(selectedSubtitles.First());
 
                 // Remove selected subtitles
                 foreach (var subtitle in selectedSubtitles)
@@ -209,8 +209,11 @@ namespace VideoPlayer
                     _subtitles.Remove(subtitle);
                 }
 
-                // Insert merged subtitle
-                _subtitles.Insert(firstIndex, mergedSubtitle);
+                // Add merged subtitle
+                _subtitles.Add(mergedSubtitle);
+
+                // Sort all subtitles by start time
+                SortSubtitles();
 
                 // Refresh ListView
                 SubtitleListView.ItemsSource = null;
@@ -226,6 +229,17 @@ namespace VideoPlayer
             {
                 Log($"Error merging subtitles: {ex}");
                 MessageBox.Show($"Error merging subtitles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void SortSubtitles()
+        {
+            // Sort subtitles by start time
+            var sortedList = _subtitles.OrderBy(s => s.StartTime).ToList();
+            _subtitles.Clear();
+            foreach (var subtitle in sortedList)
+            {
+                _subtitles.Add(subtitle);
             }
         }
 
@@ -387,6 +401,10 @@ namespace VideoPlayer
             try
             {
                 _subtitles = await _subtitleService.LoadSubtitlesAsync(filePath);
+                
+                // Sort subtitles when loading
+                _subtitles = _subtitles.OrderBy(s => s.StartTime).ToList();
+                
                 SubtitleListView.ItemsSource = _subtitles;
 
                 // Enable subtitle editing controls
@@ -622,8 +640,12 @@ namespace VideoPlayer
                     _currentSubtitle = subtitle;
                     if (subtitle != null)
                     {
-                        SubtitleListView.SelectedItem = subtitle;
-                        SubtitleListView.ScrollIntoView(subtitle);
+                        // Only update selection if editor is not locked
+                        if (LockEditorCheckBox == null || !LockEditorCheckBox.IsChecked == true)
+                        {
+                            SubtitleListView.SelectedItem = subtitle;
+                            SubtitleListView.ScrollIntoView(subtitle);
+                        }
                         SubtitleOverlay.Text = subtitle.Text;
                     }
                     else
@@ -641,8 +663,9 @@ namespace VideoPlayer
 
         private void SubtitleListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Only update the editing controls if a single item is selected
-            if (SubtitleListView.SelectedItems.Count == 1)
+            // Only update the editing controls if a single item is selected and editor is not locked
+            if (SubtitleListView.SelectedItems.Count == 1 && 
+                (LockEditorCheckBox == null || !LockEditorCheckBox.IsChecked == true))
             {
                 var selectedSubtitle = SubtitleListView.SelectedItem as SubtitleItem;
                 if (selectedSubtitle != null)
@@ -652,7 +675,7 @@ namespace VideoPlayer
                     SubtitleTextBox.Text = selectedSubtitle.Text;
                 }
             }
-            else
+            else if (!LockEditorCheckBox?.IsChecked == true)
             {
                 StartTimeTextBox.Text = "";
                 EndTimeTextBox.Text = "";
@@ -716,8 +739,18 @@ namespace VideoPlayer
                 selectedSubtitle.EndTime = endTime;
                 selectedSubtitle.Text = SubtitleTextBox.Text.Trim();
 
+                // Sort subtitles after editing times
+                SortSubtitles();
+
                 // Refresh the ListView
                 SubtitleListView.Items.Refresh();
+
+                // Uncheck the lock checkbox after applying changes
+                if (LockEditorCheckBox != null)
+                {
+                    LockEditorCheckBox.IsChecked = false;
+                }
+
                 MessageBox.Show("Changes applied successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
