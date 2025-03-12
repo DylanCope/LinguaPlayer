@@ -1,0 +1,5 @@
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer.Tests\obj\Debug\net7.0\VideoPlayer.Tests.csproj.AssemblyReference.cache
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer.Tests\obj\Debug\net7.0\VideoPlayer.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer.Tests\obj\Debug\net7.0\VideoPlayer.Tests.AssemblyInfoInputs.cache
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer.Tests\obj\Debug\net7.0\VideoPlayer.Tests.AssemblyInfo.cs
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer.Tests\obj\Debug\net7.0\VideoPlayer.Tests.csproj.CoreCompileInputs.cache

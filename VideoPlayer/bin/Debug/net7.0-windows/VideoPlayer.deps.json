@@ -8,12 +8,34 @@
     ".NETCoreApp,Version=v7.0": {
       "VideoPlayer/1.0.0": {
         "dependencies": {
+          "LibNMeCab.IpaDicBin": "0.10.0",
+          "NMeCab": "0.6.4",
           "WanaKana-net": "1.0.0"
         },
         "runtime": {
           "VideoPlayer.dll": {}
         }
       },
+      "LibNMeCab/0.10.0": {
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.dll": {
+            "assemblyVersion": "0.10.0.0",
+            "fileVersion": "2020.9.6.26073"
+          }
+        }
+      },
+      "LibNMeCab.IpaDicBin/0.10.0": {
+        "dependencies": {
+          "LibNMeCab": "0.10.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll": {
+            "assemblyVersion": "0.10.0.0",
+            "fileVersion": "0.10.0.0"
+          }
+        }
+      },
+      "NMeCab/0.6.4": {},
       "WanaKana-net/1.0.0": {
         "runtime": {
           "lib/netstandard2.0/WanaKanaNet.dll": {
@@ -29,6 +51,27 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "LibNMeCab/0.10.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-goNtk4X/yj7fY8QFJqE+EMQpqd+i8HcL4F0rBRlilfev+paPXzUMkSEubUKyL8X0qDu8wE9FfTr5SUfW1NNyyw==",
+      "path": "libnmecab/0.10.0",
+      "hashPath": "libnmecab.0.10.0.nupkg.sha512"
+    },
+    "LibNMeCab.IpaDicBin/0.10.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ky8tAvVnsRyAcRi70RvA/y7+Vr/n77kqdGI+JFoH2nbMIf2ZQr8iWNDcIy8Quh/kugjYVrA2yles32xcx75nYg==",
+      "path": "libnmecab.ipadicbin/0.10.0",
+      "hashPath": "libnmecab.ipadicbin.0.10.0.nupkg.sha512"
+    },
+    "NMeCab/0.6.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cpkMwWzDf17UQpe6k7DJbh4rCtubwSozZvd2toz/BzmqVonRhvt2rj6kljjZrRPOqi4YbqUFsOYw0Qsos1qsfw==",
+      "path": "nmecab/0.6.4",
+      "hashPath": "nmecab.0.6.4.nupkg.sha512"
     },
     "WanaKana-net/1.0.0": {
       "type": "package",

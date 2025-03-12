@@ -44,6 +44,14 @@
         "net7.0-windows7.0": {
           "targetAlias": "net7.0-windows",
           "dependencies": {
+            "LibNMeCab.IpaDicBin": {
+              "target": "Package",
+              "version": "[0.10.0, )"
+            },
+            "NMeCab": {
+              "target": "Package",
+              "version": "[0.6.4, )"
+            },
             "WanaKana-net": {
               "target": "Package",
               "version": "[1.0.0, )"

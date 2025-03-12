@@ -1,0 +1,71 @@
+=== Test Run Started ===
+
+
+=== Starting ParseText_MixedLanguages_HandlesCorrectly ===
+
+Input text: Hello みなさん、私は日本語を studying です。
+Result count: 10
+Word: 'Hello'
+Word: 'みなさん'
+Word: '、'
+Word: '私'
+Word: 'は'
+Word: '日本語'
+Word: 'を'
+Word: 'studying'
+Word: 'です'
+Word: '。'
+
+=== Test Complete ===
+
+
+=== Starting ParseText_HandlesWhitespace ===
+
+Input text: 私は  日本語    を  勉強します
+Result count: 6
+Word: '私'
+Word: 'は'
+Word: '日本語'
+Word: 'を'
+Word: '勉強'
+Word: 'します'
+
+=== Test Complete ===
+
+
+=== Starting ParseText_EmptyString_ReturnsEmptyCollection ===
+
+Testing empty string input
+Result count: 0
+
+=== Test Complete ===
+
+
+=== Starting ParseText_WithPunctuation_ParsesCorrectly ===
+
+Input text: 私は、日本語が好きです。
+Result count: 8
+Word: '私'
+Word: 'は'
+Word: '、'
+Word: '日本語'
+Word: 'が'
+Word: '好'
+Word: 'きです'
+Word: '。'
+
+=== Test Complete ===
+
+
+=== Starting ParseText_VerbConjugations ===
+
+Input text: お寿司を食べました
+Result count: 5
+Word: 'お'
+Word: '寿司'
+Word: 'を'
+Word: '食'
+Word: 'べました'
+
+=== Test Complete ===
+

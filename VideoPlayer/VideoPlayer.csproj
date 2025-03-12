@@ -23,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibNMeCab.IpaDicBin" Version="0.10.0" />
+    <PackageReference Include="NMeCab" Version="0.6.4" />
     <PackageReference Include="WanaKana-net" Version="1.0.0" />
   </ItemGroup>
 

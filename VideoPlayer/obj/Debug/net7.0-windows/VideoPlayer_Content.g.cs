@@ -230,5 +230,11 @@
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("ffmpeg/lib/swscale.lib")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("ffmpeg/license.txt")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("ffmpeg/readme.txt")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("authors")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("char.bin")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("copying")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("matrix.bin")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("sys.dic")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("unk.dic")]
 
 

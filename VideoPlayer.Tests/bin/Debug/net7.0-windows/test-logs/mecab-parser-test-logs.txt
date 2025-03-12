@@ -1,0 +1,73 @@
+=== Test Run Started ===
+
+
+=== Starting ParseText_BasicVerb_IdentifiesPartsOfSpeech ===
+
+Input text: 食べる
+Result count: 1
+Word: '食べる'
+Part of Speech: '動詞'
+Reading: 'タベル'
+
+=== Test Complete ===
+
+
+=== Starting ParseText_EmptyString_ReturnsEmptyCollection ===
+
+Testing empty string input
+Result count: 0
+
+=== Test Complete ===
+
+
+=== Starting ParseText_VerbConjugation_IdentifiesBaseForm ===
+
+Input text: 食べました
+Result count: 3
+Word: '食べ'
+Part of Speech: '動詞'
+Dictionary Form: ''
+Reading: 'タベ'
+Word: 'まし'
+Part of Speech: '助動詞'
+Dictionary Form: ''
+Reading: 'マシ'
+Word: 'た'
+Part of Speech: '助動詞'
+Dictionary Form: ''
+Reading: 'タ'
+
+=== Test Complete ===
+
+
+=== Starting ParseText_ParticlesAndPunctuation_IdentifiesCorrectly ===
+
+Input text: 私は、本を読みます。
+Result count: 8
+Word: '私'
+Part of Speech: '名詞'
+Reading: 'ワタシ'
+Word: 'は'
+Part of Speech: '助詞'
+Reading: 'ハ'
+Word: '、'
+Part of Speech: '記号'
+Reading: '、'
+Word: '本'
+Part of Speech: '名詞'
+Reading: 'ホン'
+Word: 'を'
+Part of Speech: '助詞'
+Reading: 'ヲ'
+Word: '読み'
+Part of Speech: '動詞'
+Reading: 'ヨミ'
+Word: 'ます'
+Part of Speech: '助動詞'
+Reading: 'マス'
+Word: '。'
+Part of Speech: '記号'
+Reading: '。'
+
+=== Test Complete ===
+

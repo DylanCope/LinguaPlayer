@@ -2,6 +2,45 @@
   "version": 3,
   "targets": {
     "net7.0-windows7.0": {
+      "LibNMeCab/0.10.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/LibNMeCab.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "LibNMeCab.IpaDicBin/0.10.0": {
+        "type": "package",
+        "dependencies": {
+          "LibNMeCab": "[0.10.0, 0.11.0)"
+        },
+        "compile": {
+          "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll": {}
+        },
+        "build": {
+          "build/LibNMeCab.IpaDicBin.props": {},
+          "build/LibNMeCab.IpaDicBin.targets": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/LibNMeCab.IpaDicBin.props": {},
+          "buildMultiTargeting/LibNMeCab.IpaDicBin.targets": {}
+        }
+      },
+      "NMeCab/0.6.4": {
+        "type": "package",
+        "build": {
+          "build/NMeCab.targets": {}
+        }
+      },
       "WanaKana-net/1.0.0": {
         "type": "package",
         "compile": {
@@ -14,6 +53,64 @@
     }
   },
   "libraries": {
+    "LibNMeCab/0.10.0": {
+      "sha512": "goNtk4X/yj7fY8QFJqE+EMQpqd+i8HcL4F0rBRlilfev+paPXzUMkSEubUKyL8X0qDu8wE9FfTr5SUfW1NNyyw==",
+      "type": "package",
+      "path": "libnmecab/0.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NMeCab-icon-512.png",
+        "lib/netstandard2.0/LibNMeCab.dll",
+        "lib/netstandard2.0/LibNMeCab.xml",
+        "libnmecab.0.10.0.nupkg.sha512",
+        "libnmecab.nuspec"
+      ]
+    },
+    "LibNMeCab.IpaDicBin/0.10.0": {
+      "sha512": "Ky8tAvVnsRyAcRi70RvA/y7+Vr/n77kqdGI+JFoH2nbMIf2ZQr8iWNDcIy8Quh/kugjYVrA2yles32xcx75nYg==",
+      "type": "package",
+      "path": "libnmecab.ipadicbin/0.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NMeCab-icon-512.png",
+        "build/LibNMeCab.IpaDicBin.props",
+        "build/LibNMeCab.IpaDicBin.targets",
+        "buildMultiTargeting/LibNMeCab.IpaDicBin.props",
+        "buildMultiTargeting/LibNMeCab.IpaDicBin.targets",
+        "content/IpaDic/AUTHORS",
+        "content/IpaDic/COPYING",
+        "content/IpaDic/char.bin",
+        "content/IpaDic/matrix.bin",
+        "content/IpaDic/sys.dic",
+        "content/IpaDic/unk.dic",
+        "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll",
+        "libnmecab.ipadicbin.0.10.0.nupkg.sha512",
+        "libnmecab.ipadicbin.nuspec"
+      ]
+    },
+    "NMeCab/0.6.4": {
+      "sha512": "cpkMwWzDf17UQpe6k7DJbh4rCtubwSozZvd2toz/BzmqVonRhvt2rj6kljjZrRPOqi4YbqUFsOYw0Qsos1qsfw==",
+      "type": "package",
+      "path": "nmecab/0.6.4",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/NMeCab.targets",
+        "content/net40/_._",
+        "content/net45/dic/ipadic/char.bin",
+        "content/net45/dic/ipadic/dicrc",
+        "content/net45/dic/ipadic/matrix.bin",
+        "content/net45/dic/ipadic/sys.dic",
+        "content/net45/dic/ipadic/unk.dic",
+        "lib/LibNMeCab.dll",
+        "nmecab.0.6.4.nupkg.sha512",
+        "nmecab.nuspec",
+        "tools/uninstall.ps1"
+      ]
+    },
     "WanaKana-net/1.0.0": {
       "sha512": "dKRJ8JwDQVBdFwHM0Tinyg2SnYEvwH62+kcdZtO+SLkf/poG22+v3k3Cf2qAOfxMpGN7IBf9FT+TD9DTWRPIyA==",
       "type": "package",
@@ -30,6 +127,8 @@
   },
   "projectFileDependencyGroups": {
     "net7.0-windows7.0": [
+      "LibNMeCab.IpaDicBin >= 0.10.0",
+      "NMeCab >= 0.6.4",
       "WanaKana-net >= 1.0.0"
     ]
   },
@@ -77,6 +176,14 @@
       "net7.0-windows7.0": {
         "targetAlias": "net7.0-windows",
         "dependencies": {
+          "LibNMeCab.IpaDicBin": {
+            "target": "Package",
+            "version": "[0.10.0, )"
+          },
+          "NMeCab": {
+            "target": "Package",
+            "version": "[0.6.4, )"
+          },
           "WanaKana-net": {
             "target": "Package",
             "version": "[1.0.0, )"

@@ -13,4 +13,10 @@
     <SourceRoot Include="C:\Users\dylan\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
+  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)libnmecab.ipadicbin\0.10.0\build\LibNMeCab.IpaDicBin.props" Condition="Exists('$(NuGetPackageRoot)libnmecab.ipadicbin\0.10.0\build\LibNMeCab.IpaDicBin.props')" />
+  </ImportGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgNMeCab Condition=" '$(PkgNMeCab)' == '' ">C:\Users\dylan\.nuget\packages\nmecab\0.6.4</PkgNMeCab>
+  </PropertyGroup>
 </Project>

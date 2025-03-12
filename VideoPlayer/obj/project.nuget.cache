@@ -1,9 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "8wHDXSUp2WHX/bi9yRHY1QVyCk+dckIcIdSiJZX87BumRSRak/wtVeQweY5HUC8NzssLwi9RH2Y3M1JboVvoNw==",
+  "dgSpecHash": "QVewFngFaoxRZO1K/p6nimCxwgvpwKH4wucnmDQoBmLdwi48ddHEj4fSwkp/BAVjoCVcJkoejAyAuJ95teNVqw==",
   "success": true,
   "projectFilePath": "C:\\Users\\dylan\\OneDrive\\Japanese\\VideoPlayerProject\\VideoPlayer\\VideoPlayer.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\dylan\\.nuget\\packages\\libnmecab\\0.10.0\\libnmecab.0.10.0.nupkg.sha512",
+    "C:\\Users\\dylan\\.nuget\\packages\\libnmecab.ipadicbin\\0.10.0\\libnmecab.ipadicbin.0.10.0.nupkg.sha512",
+    "C:\\Users\\dylan\\.nuget\\packages\\nmecab\\0.6.4\\nmecab.0.6.4.nupkg.sha512",
     "C:\\Users\\dylan\\.nuget\\packages\\wanakana-net\\1.0.0\\wanakana-net.1.0.0.nupkg.sha512"
   ],
   "logs": []
