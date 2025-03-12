@@ -249,3 +249,5 @@ C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\bin\Debug\net7.0
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\bin\Debug\net7.0-windows\FFmpeg\lib\swscale-8.def
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\bin\Debug\net7.0-windows\FFmpeg\lib\swscale.lib
 C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\bin\Debug\net7.0-windows\FFmpeg\LICENSE.txt
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\bin\Debug\net7.0-windows\WanaKanaNet.dll
+C:\Users\dylan\OneDrive\Japanese\VideoPlayerProject\VideoPlayer\obj\Debug\net7.0-windows\VideoPlayer.csproj.CopyComplete

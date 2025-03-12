@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "705LEt8AXGftUNhSatz7cEas8z+fZrQF/0/ytMraN4HH6qA05eNcSLDvcQ/Jbq5s/M0NZLMOVxfp3yQ/tGkvow==",
+  "dgSpecHash": "8wHDXSUp2WHX/bi9yRHY1QVyCk+dckIcIdSiJZX87BumRSRak/wtVeQweY5HUC8NzssLwi9RH2Y3M1JboVvoNw==",
   "success": true,
   "projectFilePath": "C:\\Users\\dylan\\OneDrive\\Japanese\\VideoPlayerProject\\VideoPlayer\\VideoPlayer.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\dylan\\.nuget\\packages\\wanakana-net\\1.0.0\\wanakana-net.1.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

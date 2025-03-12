@@ -140,14 +140,28 @@ namespace VideoPlayer
             SubtitleListView.ItemsSource = _subtitles;
             SubtitleListView.SelectionMode = SelectionMode.Extended;  // Enable multi-selection
             
+            // Add double-click handler
+            SubtitleListView.MouseDoubleClick += (s, e) =>
+            {
+                if (e.OriginalSource is FrameworkElement element && 
+                    element.DataContext is SubtitleItem subtitle)
+                {
+                    JumpToSubtitle(subtitle);
+                }
+            };
+            
             // Add context menu
             var contextMenu = new ContextMenu();
             var mergeMenuItem = new MenuItem { Header = "Merge Subtitles" };
             var exportAudioMenuItem = new MenuItem { Header = "Export Audio" };
+            var jumpToMenuItem = new MenuItem { Header = "Jump to" };
             mergeMenuItem.Click += MergeSubtitles_Click;
             exportAudioMenuItem.Click += ExportAudio_Click;
+            jumpToMenuItem.Click += JumpToSelected_Click;
             contextMenu.Items.Add(mergeMenuItem);
             contextMenu.Items.Add(exportAudioMenuItem);
+            contextMenu.Items.Add(new Separator());
+            contextMenu.Items.Add(jumpToMenuItem);
             SubtitleListView.ContextMenu = contextMenu;
             
             // Handle context menu opening to enable/disable options
@@ -156,6 +170,7 @@ namespace VideoPlayer
                 var selectedItems = SubtitleListView.SelectedItems.Cast<SubtitleItem>().ToList();
                 mergeMenuItem.IsEnabled = CanMergeSubtitles(selectedItems);
                 exportAudioMenuItem.IsEnabled = selectedItems.Count > 0 && !string.IsNullOrEmpty(_currentVideoPath);
+                jumpToMenuItem.IsEnabled = selectedItems.Count > 0;
             };
             
             // Clear subtitle overlay
@@ -998,6 +1013,53 @@ namespace VideoPlayer
             {
                 Log($"Error exporting audio: {ex}");
                 CustomMessageBox.Show($"Error exporting audio: {ex.Message}", "Error");
+            }
+        }
+
+        private void JumpToSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedSubtitles = SubtitleListView.SelectedItems.Cast<SubtitleItem>().ToList();
+            if (selectedSubtitles.Count > 0)
+            {
+                // Sort by start time and jump to the earliest subtitle
+                var earliestSubtitle = selectedSubtitles
+                    .OrderBy(s => s.StartTime)
+                    .First();
+                JumpToSubtitle(earliestSubtitle);
+            }
+        }
+
+        private void JumpToSubtitle(SubtitleItem subtitle)
+        {
+            if (VideoPlayer?.Source == null || subtitle == null) return;
+
+            try
+            {
+                // Navigate to the start of the subtitle
+                VideoPlayer.Position = subtitle.StartTime;
+                TimelineSlider.Value = subtitle.StartTime.TotalSeconds;
+                
+                // Update display
+                UpdateTimeDisplay(VideoPlayer.Position, VideoPlayer.NaturalDuration.TimeSpan);
+                UpdateCurrentSubtitle();
+                
+                // Ensure the subtitle is visible in the list
+                SubtitleListView.ScrollIntoView(subtitle);
+
+                // Start playing if currently paused
+                if (!_isPlaying)
+                {
+                    VideoPlayer.Play();
+                    _timer.Start();
+                    _isPlaying = true;
+                    PlayPauseButton.Content = "Pause";
+                }
+                
+                Log($"Jumped to subtitle at {subtitle.StartTime}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error jumping to subtitle: {ex}");
             }
         }
     }

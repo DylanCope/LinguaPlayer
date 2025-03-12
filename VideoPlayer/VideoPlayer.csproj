@@ -22,4 +22,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="WanaKana-net" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

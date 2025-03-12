@@ -1,11 +1,37 @@
 {
   "version": 3,
   "targets": {
-    "net7.0-windows7.0": {}
+    "net7.0-windows7.0": {
+      "WanaKana-net/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/WanaKanaNet.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/WanaKanaNet.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "WanaKana-net/1.0.0": {
+      "sha512": "dKRJ8JwDQVBdFwHM0Tinyg2SnYEvwH62+kcdZtO+SLkf/poG22+v3k3Cf2qAOfxMpGN7IBf9FT+TD9DTWRPIyA==",
+      "type": "package",
+      "path": "wanakana-net/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/WanaKanaNet.dll",
+        "wanakana-net.1.0.0.nupkg.sha512",
+        "wanakana-net.nuspec",
+        "wanikani.png"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    "net7.0-windows7.0": []
+    "net7.0-windows7.0": [
+      "WanaKana-net >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\dylan\\.nuget\\packages\\": {},
@@ -50,6 +76,12 @@
     "frameworks": {
       "net7.0-windows7.0": {
         "targetAlias": "net7.0-windows",
+        "dependencies": {
+          "WanaKana-net": {
+            "target": "Package",
+            "version": "[1.0.0, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",
